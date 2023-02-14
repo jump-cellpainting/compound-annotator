@@ -103,3 +103,24 @@ Rendered as a table:
 | 1931437         | CHEMBL4523105    | B          | CHEMBL3716578      | 5.85          | 9                | GUUWHOSUKOCRHG-UHFFFAOYSA-N |              |
 | 1931437         | CHEMBL4523105    | B          | CHEMBL4571346      | 5.01          | 9                | ILKYRSSTSHMXTC-UHFFFAOYSA-N |              |
 | 446514          | CHEMBL2094132    | B          | CHEMBL1112         | 6.3           | 5                | CEUORZQYGODEFX-UHFFFAOYSA-N | ARIPIPRAZOLE |
+
+Count the number of rows in the filtered annotation file
+
+```sh
+gzcat data/chembl_annotation_filtered.csv.gz | wc -l
+```
+
+```text
+44018
+```
+
+Count the number of unique `standard_inchi_key` in the filtered annotation file
+
+```sh
+gzcat data/chembl_annotation_filtered.csv.gz | csvcut -c standard_inchi_key | tail -n +2 | sort | uniq | wc -l
+```
+
+```text
+4718
+```
+
