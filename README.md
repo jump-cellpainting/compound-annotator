@@ -91,6 +91,7 @@ Now find rows in `data/chembl_annotation.csv` that have `standard_inchi_key` tha
 ```sh
 csvgrep -c standard_inchi_key -f data/compound_inchi_key.csv <(gzcat data/chembl_annotation.csv.gz) | gzip > data/chembl_annotation_filtered.csv.gz
 ```
+
 Count the number of rows in the filtered annotation file
 
 ```sh
