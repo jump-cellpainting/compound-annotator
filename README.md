@@ -62,6 +62,8 @@ Rendered as a table:
 | 1714633         | CHEMBL3987582    | B          | CHEMBL4108338      | 6.15          | 7                | OZBMIGDQBBMIRA-CQSZACIVSA-N |           |
 | 1714649         | CHEMBL3987582    | B          | CHEMBL4108338      | 5.84          | 7                | OZBMIGDQBBMIRA-CQSZACIVSA-N |           |
 
+### Create filtered annotation file
+
 Filter the annotation file to only include rows with `standard_inchi_key` that are present in the `compound.csv.gz` file
 
 ```sh
