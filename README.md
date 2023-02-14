@@ -22,18 +22,14 @@ On a VM with >40G disk space, download ChEMBL SQLite database (4.2G compressed, 
 ```sh
 wget https://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/latest/chembl_31_sqlite.tar.gz
 tar -xvzf chembl_31_sqlite.tar.gz
+tree chembl_31
+# chembl_31
+# └── chembl_31_sqlite
+#     ├── INSTALL_sqlite
+#     └── chembl_31.db
 ```
 
-This produces a directory `chembl_31_sqlite` with the following structure:
-
-```sh
-chembl_31
-└── chembl_31_sqlite
-    ├── INSTALL_sqlite
-    └── chembl_31.db
-```
-
-Run SQL query to extract ChEMBL annotation
+Run a SQL query to extract ChEMBL annotation
 
 ```sh
 sqlite3 -header -csv chembl_31/chembl_31_sqlite/chembl_31.db < sql/extract_chembl_annotation.sql | gzip > data/chembl_annotation.csv.gz
@@ -62,18 +58,29 @@ Rendered as a table:
 | 1714633         | CHEMBL3987582    | B          | CHEMBL4108338      | 6.15          | 7                | OZBMIGDQBBMIRA-CQSZACIVSA-N |           |
 | 1714649         | CHEMBL3987582    | B          | CHEMBL4108338      | 5.84          | 7                | OZBMIGDQBBMIRA-CQSZACIVSA-N |           |
 
-Count the number of rows in the  annotation file
+Count the number of rows in the annotation file
 
 ```sh
 gzcat data/chembl_annotation.csv.gz | wc -l
 # 1185184
 ```
 
-Count the number of unique `standard_inchi_key` in the annotation file
-
 ```sh
-gzcat data/chembl_annotation.csv.gz | csvcut -c standard_inchi_key | tail -n +2 | sort | uniq | wc -l
-# 556272
+data_file=data/chembl_annotation.csv.gz
+colnames="assay_chembl_id target_chembl_id assay_type molecule_chembl_id standard_inchi_key pref_name"
+for colname in ${colnames}; do
+    echo -n $colname:
+    gzcat ${data_file} | csvcut -c ${colname} | tail -n +2 | sort | uniq | wc -l | tr -s " "
+done
+```
+
+```text
+assay_chembl_id: 99298
+target_chembl_id: 3076
+assay_type: 2
+molecule_chembl_id: 556272
+standard_inchi_key: 56272
+pref_name: 6536
 ```
 
 ### Create filtered annotation file
@@ -125,11 +132,24 @@ gzcat data/chembl_annotation_filtered.csv.gz | wc -l
 # 44018
 ```
 
-Count the number of unique `standard_inchi_key` in the filtered annotation file
+Count the number of unique values of each column in the filtered annotation file
 
 ```sh
-gzcat data/chembl_annotation_filtered.csv.gz | csvcut -c standard_inchi_key | tail -n +2 | sort | uniq | wc -l
-# 4718
+data_file=data/chembl_annotation_filtered.csv.gz
+colnames="assay_chembl_id target_chembl_id assay_type molecule_chembl_id standard_inchi_key pref_name"
+for colname in ${colnames}; do
+    echo -n $colname:
+    gzcat ${data_file} | csvcut -c ${colname} | tail -n +2 | sort | uniq | wc -l | tr -s " "
+done
+```
+
+```text
+assay_chembl_id: 18856
+target_chembl_id: 1744
+assay_type: 2
+molecule_chembl_id: 4718
+standard_inchi_key: 4718
+pref_name: 1340
 ```
 
 Here are all the commands in one place to create `chembl_annotation_filtered.csv.gz` from `chembl_annotation.csv.gz` and `compound.csv.gz`:
@@ -209,9 +229,19 @@ CHEMBL3449946,AABSTWCOLWSFRA-UHFFFAOYSA-N,
 | CHEMBL1734241      | AAAZRMGPBSWFDK-UHFFFAOYSA-N |           |
 | CHEMBL3449946      | AABSTWCOLWSFRA-UHFFFAOYSA-N |           |
 
-Count the number of rows in the `inchikey_chembl_filtered.csv.gz` file
+Count the number of unique values of each column in `inchikey_chembl_filtered.csv.gz`
 
 ```sh
-gzcat data/inchikey_chembl_filtered.csv.gz | wc -l
-# 30073
+data_file=data/inchikey_chembl_filtered.csv.gz
+colnames="molecule_chembl_id standard_inchi_key pref_name"
+for colname in ${colnames}; do
+    echo -n $colname:
+    gzcat ${data_file} | csvcut -c ${colname} | tail -n +2 | sort | uniq | wc -l | tr -s " "
+done
+```
+
+```text
+molecule_chembl_id: 30072
+standard_inchi_key: 30072
+pref_name: 2508
 ```
