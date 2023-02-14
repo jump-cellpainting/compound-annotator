@@ -66,20 +66,14 @@ Count the number of rows in the  annotation file
 
 ```sh
 gzcat data/chembl_annotation.csv.gz | wc -l
-```
-
-```text
-1185184
+# 1185184
 ```
 
 Count the number of unique `standard_inchi_key` in the annotation file
 
 ```sh
 gzcat data/chembl_annotation.csv.gz | csvcut -c standard_inchi_key | tail -n +2 | sort | uniq | wc -l
-```
-
-```text
-556272
+# 556272
 ```
 
 ### Create filtered annotation file
@@ -128,20 +122,14 @@ Count the number of rows in the filtered annotation file
 
 ```sh
 gzcat data/chembl_annotation_filtered.csv.gz | wc -l
-```
-
-```text
-44018
+# 44018
 ```
 
 Count the number of unique `standard_inchi_key` in the filtered annotation file
 
 ```sh
 gzcat data/chembl_annotation_filtered.csv.gz | csvcut -c standard_inchi_key | tail -n +2 | sort | uniq | wc -l
-```
-
-```text
-4718
+# 4718
 ```
 
 Here are all the commands in one place to create `chembl_annotation_filtered.csv.gz` from `chembl_annotation.csv.gz` and `compound.csv.gz`:
@@ -191,10 +179,7 @@ Count the number of rows in the `inchikey_chembl.csv.gz` file
 
 ```sh
 gzcat data/inchikey_chembl.csv.gz | wc -l
-```
-
-```text
-2304876
+# 2304876
 ```
 
 Now find rows in `data/inchikey_chembl.csv.gz` that have `standard_inchi_key` that are present in `data/compound_inchi_key.csv`
@@ -228,8 +213,5 @@ Count the number of rows in the `inchikey_chembl_filtered.csv.gz` file
 
 ```sh
 gzcat data/inchikey_chembl_filtered.csv.gz | wc -l
-```
-
-```text
-30073
+# 30073
 ```
