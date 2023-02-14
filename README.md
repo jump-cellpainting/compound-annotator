@@ -38,18 +38,8 @@ sqlite3 -header -csv chembl_31/chembl_31_sqlite/chembl_31.db < sql/extract_chemb
 View the top 5 rows of the annotation file
 
 ```sh
-head -n 5 <(gzcat data/chembl_annotation.csv.gz)
+python csv2md.py <(gzcat data/chembl_annotation.csv.gz|head -n 5)
 ```
-
-```text
-assay_chembl_id,target_chembl_id,assay_type,molecule_chembl_id,pchembl_value,confidence_score,standard_inchi_key,pref_name
-1714633,CHEMBL3987582,B,CHEMBL4107559,6.07,7,UVVXRMZCPKQLAO-OAHLLOKOSA-N,
-1714649,CHEMBL3987582,B,CHEMBL4107559,5.86,7,UVVXRMZCPKQLAO-OAHLLOKOSA-N,
-1714633,CHEMBL3987582,B,CHEMBL4108338,6.15,7,OZBMIGDQBBMIRA-CQSZACIVSA-N,
-1714649,CHEMBL3987582,B,CHEMBL4108338,5.84,7,OZBMIGDQBBMIRA-CQSZACIVSA-N,
-```
-
-Rendered as a table:
 
 | assay_chembl_id | target_chembl_id | assay_type | molecule_chembl_id | pchembl_value | confidence_score | standard_inchi_key          | pref_name |
 |-----------------|------------------|------------|--------------------|---------------|------------------|-----------------------------|-----------|
@@ -153,25 +143,15 @@ sqlite3 -header -csv chembl_31/chembl_31_sqlite/chembl_31.db < sql/extract_chemb
 View the top 5 rows of the `inchikey_chembl.csv.gz` file
 
 ```sh
-head -n 5 <(gzcat data/inchikey_chembl.csv.gz)
+python csv2md.py <(gzcat data/inchikey_chembl.csv.gz|head -n 5)
 ```
-
-```text
-molecule_chembl_id,standard_inchi_key,pref_name
-CHEMBL4972698,AAAADVYFXUUVEO-UHFFFAOYSA-N,
-CHEMBL492934,AAAAEENPAALFRN-UHFFFAOYSA-N,
-CHEMBL4097563,AAAAJHGLNDAXFP-VNKVACROSA-N,
-CHEMBL246893,AAAAKTROWFNLEP-UHFFFAOYSA-N,
-```
-
-Rendered as a table:
 
 | molecule_chembl_id | standard_inchi_key          | pref_name |
 |--------------------|-----------------------------|-----------|
-| CHEMBL4972698      | AAAADVYFXUUVEO-UHFFFAOYSA-N |           |
-| CHEMBL492934       | AAAAEENPAALFRN-UHFFFAOYSA-N |           |
-| CHEMBL4097563      | AAAAJHGLNDAXFP-VNKVACROSA-N |           |
-| CHEMBL246893       | AAAAKTROWFNLEP-UHFFFAOYSA-N |           |
+| CHEMBL592894       | AAAJHRMBUHXWLD-UHFFFAOYSA-N |           |
+| CHEMBL268868       | AAALVYBICLMAMA-UHFFFAOYSA-N | DAPH      |
+| CHEMBL1734241      | AAAZRMGPBSWFDK-UHFFFAOYSA-N |           |
+| CHEMBL3449946      | AABSTWCOLWSFRA-UHFFFAOYSA-N |           |
 
 Count the number of rows in the `inchikey_chembl.csv.gz` file
 
