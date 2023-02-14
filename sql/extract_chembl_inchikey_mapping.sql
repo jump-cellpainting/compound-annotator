@@ -7,4 +7,3 @@ FROM
     `molecule_dictionary`
 WHERE
     `compound_structures`.`molregno` = `molecule_dictionary`.`molregno`
-    AND `molecule_dictionary`.`molregno` = `activities`.`molregno`
