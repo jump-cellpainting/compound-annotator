@@ -36,7 +36,7 @@ chembl_31
 Run SQL query to extract ChEMBL annotation
 
 ```sh
-sqlite3 -header -csv chembl_31/chembl_31_sqlite/chembl_31.db < sql/extract_chembl_annotation.sql | gzip > data/chembl_annotation.csv
+sqlite3 -header -csv chembl_31/chembl_31_sqlite/chembl_31.db < sql/extract_chembl_annotation.sql | gzip > data/chembl_annotation.csv.gz
 ```
 
 View the top 5 rows of the annotation file
@@ -156,4 +156,43 @@ mv compound.csv.gz data/
 gzcat data/compound.csv.gz | csvcut -c Metadata_InChIKey| tail -n +2 | sort | uniq > data/compound_inchi_key.csv
 
 csvgrep -c standard_inchi_key -f data/compound_inchi_key.csv <(gzcat data/chembl_annotation.csv.gz) | gzip > data/chembl_annotation_filtered.csv.gz
+```
+
+### Create mapping between `standard_inchi_key` and `chembl_id`
+
+Run SQL query to get mapping between `standard_inchi_key` and `chembl_id`
+
+```sh
+sqlite3 -header -csv chembl_31/chembl_31_sqlite/chembl_31.db < sql/extract_chembl_inchikey_mapping.sql  | gzip > data/inchikey_chembl.csv.gz
+```
+
+View the top 5 rows of the `inchikey_chembl.csv.gz` file
+
+```sh
+head -n 5 <(gzcat data/inchikey_chembl.csv.gz)
+```
+
+```text
+molecule_chembl_id,standard_inchi_key,pref_name
+CHEMBL4972698,AAAADVYFXUUVEO-UHFFFAOYSA-N,
+CHEMBL492934,AAAAEENPAALFRN-UHFFFAOYSA-N,
+CHEMBL4097563,AAAAJHGLNDAXFP-VNKVACROSA-N,
+CHEMBL246893,AAAAKTROWFNLEP-UHFFFAOYSA-N,
+```
+
+| molecule_chembl_id | standard_inchi_key          | pref_name |
+|--------------------|-----------------------------|-----------|
+| CHEMBL4972698      | AAAADVYFXUUVEO-UHFFFAOYSA-N |           |
+| CHEMBL492934       | AAAAEENPAALFRN-UHFFFAOYSA-N |           |
+| CHEMBL4097563      | AAAAJHGLNDAXFP-VNKVACROSA-N |           |
+| CHEMBL246893       | AAAAKTROWFNLEP-UHFFFAOYSA-N |           |
+
+Count the number of rows in the `inchikey_chembl.csv.gz` file
+
+```sh
+gzcat data/inchikey_chembl.csv.gz | wc -l
+```
+
+```text
+2304876
 ```
