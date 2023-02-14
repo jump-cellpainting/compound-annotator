@@ -196,3 +196,40 @@ gzcat data/inchikey_chembl.csv.gz | wc -l
 ```text
 2304876
 ```
+
+Now find rows in `data/inchikey_chembl.csv.gz` that have `standard_inchi_key` that are present in `data/compound_inchi_key.csv`
+
+```sh
+csvgrep -c standard_inchi_key -f data/compound_inchi_key.csv <(gzcat data/inchikey_chembl.csv.gz) | gzip > data/inchikey_chembl_filtered.csv.gz
+```
+
+View the top 5 rows of the `inchikey_chembl_filtered.csv.gz` file
+
+```sh
+head -n 5 <(gzcat data/inchikey_chembl_filtered.csv.gz)
+```
+
+```text
+molecule_chembl_id,standard_inchi_key,pref_name
+CHEMBL592894,AAAJHRMBUHXWLD-UHFFFAOYSA-N,
+CHEMBL268868,AAALVYBICLMAMA-UHFFFAOYSA-N,DAPH
+CHEMBL1734241,AAAZRMGPBSWFDK-UHFFFAOYSA-N,
+CHEMBL3449946,AABSTWCOLWSFRA-UHFFFAOYSA-N,
+```
+
+| molecule_chembl_id | standard_inchi_key          | pref_name |
+|--------------------|-----------------------------|-----------|
+| CHEMBL592894       | AAAJHRMBUHXWLD-UHFFFAOYSA-N |           |
+| CHEMBL268868       | AAALVYBICLMAMA-UHFFFAOYSA-N | DAPH      |
+| CHEMBL1734241      | AAAZRMGPBSWFDK-UHFFFAOYSA-N |           |
+| CHEMBL3449946      | AABSTWCOLWSFRA-UHFFFAOYSA-N |           |
+
+Count the number of rows in the `inchikey_chembl_filtered.csv.gz` file
+
+```sh
+gzcat data/inchikey_chembl_filtered.csv.gz | wc -l
+```
+
+```text
+30073
+```
