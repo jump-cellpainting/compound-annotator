@@ -124,3 +124,16 @@ gzcat data/chembl_annotation_filtered.csv.gz | csvcut -c standard_inchi_key | ta
 4718
 ```
 
+Here are all the commands in one place to create `chembl_annotation_filtered.csv.gz` from `chembl_annotation.csv.gz` and `compound.csv.gz`:
+
+```sh
+commit=0682dd2d52e4d68208ab4af3a0bd114ca557cb0e
+
+wget https://raw.githubusercontent.com/jump-cellpainting/datasets/${commit}/metadata/compound.csv.gz
+
+mv compound.csv.gz data/
+
+gzcat data/compound.csv.gz | csvcut -c Metadata_InChIKey| tail -n +2 | sort | uniq > data/compound_inchi_key.csv
+
+csvgrep -c standard_inchi_key -f data/compound_inchi_key.csv <(gzcat data/chembl_annotation.csv.gz) | gzip > data/chembl_annotation_filtered.csv.gz
+```
