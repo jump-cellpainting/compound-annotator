@@ -1,2 +1,4 @@
 chembl_31
 chembl_31_sqlite.tar
+data/compound_inchi_key.csv
+data/compound.csv.gz
