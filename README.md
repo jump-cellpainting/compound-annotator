@@ -93,13 +93,13 @@ mv compound.csv.gz data/
 ```
 
 ```sh
-gzcat data/compound.csv.gz | csvcut -c Metadata_InChIKey| tail -n +2 | sort | uniq > data/compound_inchi_key.csv
+gzcat data/compound.csv.gz | csvcut -c Metadata_InChIKey| tail -n +2 | sort | uniq > data/compound_inchi_key.txt
 ```
 
-Now find rows in `data/chembl_annotation.csv` that have `standard_inchi_key` that are present in `data/compound_inchi_key.csv`
+Now find rows in `data/chembl_annotation.csv` that have `standard_inchi_key` that are present in `data/compound_inchi_key.txt`
 
 ```sh
-csvgrep -c standard_inchi_key -f data/compound_inchi_key.csv <(gzcat data/chembl_annotation.csv.gz) | gzip > data/chembl_annotation_filtered.csv.gz
+csvgrep -c standard_inchi_key -f data/compound_inchi_key.txt <(gzcat data/chembl_annotation.csv.gz) | gzip > data/chembl_annotation_filtered.csv.gz
 ```
 
 Count the number of rows in the filtered annotation file
@@ -135,9 +135,9 @@ wget https://raw.githubusercontent.com/jump-cellpainting/datasets/${commit}/meta
 
 mv compound.csv.gz data/
 
-gzcat data/compound.csv.gz | csvcut -c Metadata_InChIKey| tail -n +2 | sort | uniq > data/compound_inchi_key.csv
+gzcat data/compound.csv.gz | csvcut -c Metadata_InChIKey| tail -n +2 | sort | uniq > data/compound_inchi_key.txt
 
-csvgrep -c standard_inchi_key -f data/compound_inchi_key.csv <(gzcat data/chembl_annotation.csv.gz) | gzip > data/chembl_annotation_filtered.csv.gz
+csvgrep -c standard_inchi_key -f data/compound_inchi_key.txt <(gzcat data/chembl_annotation.csv.gz) | gzip > data/chembl_annotation_filtered.csv.gz
 ```
 
 ### Create mapping between `standard_inchi_key` and `chembl_id`
@@ -168,10 +168,10 @@ gzcat data/inchikey_chembl.csv.gz | wc -l
 # 2304876
 ```
 
-Now find rows in `data/inchikey_chembl.csv.gz` that have `standard_inchi_key` that are present in `data/compound_inchi_key.csv`
+Now find rows in `data/inchikey_chembl.csv.gz` that have `standard_inchi_key` that are present in `data/compound_inchi_key.txt`
 
 ```sh
-csvgrep -c standard_inchi_key -f data/compound_inchi_key.csv <(gzcat data/inchikey_chembl.csv.gz) | gzip > data/inchikey_chembl_filtered.csv.gz
+csvgrep -c standard_inchi_key -f data/compound_inchi_key.txt <(gzcat data/inchikey_chembl.csv.gz) | gzip > data/inchikey_chembl_filtered.csv.gz
 ```
 
 Count the number of unique values of each column in `inchikey_chembl_filtered.csv.gz`
@@ -186,4 +186,9 @@ count_unique_values ${data_file} "${colnames}"
 molecule_chembl_id: 30072
 standard_inchi_key: 30072
 pref_name: 2508
+```
+
+```sh
+wc -l data/compound_inchi_key.txt
+# 116753
 ```
