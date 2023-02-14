@@ -81,6 +81,26 @@ Now find rows in `data/chembl_annotation.csv` that have `standard_inchi_key` tha
 csvgrep -c standard_inchi_key -f data/compound_inchi_key.csv <(gzcat data/chembl_annotation.csv.gz) | gzip > data/chembl_annotation_filtered.csv.gz
 ```
 
+Count the number of rows in the  annotation file
+
+```sh
+gzcat data/chembl_annotation.csv.gz | wc -l
+```
+
+```text
+1185184
+```
+
+Count the number of unique `standard_inchi_key` in the annotation file
+
+```sh
+gzcat data/chembl_annotation.csv.gz | csvcut -c standard_inchi_key | tail -n +2 | sort | uniq | wc -l
+```
+
+```text
+556272
+```
+
 View the top 5 rows of the filtered annotation file
 
 ```sh
