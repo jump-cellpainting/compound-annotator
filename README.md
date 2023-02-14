@@ -101,30 +101,6 @@ Now find rows in `data/chembl_annotation.csv` that have `standard_inchi_key` tha
 ```sh
 csvgrep -c standard_inchi_key -f data/compound_inchi_key.csv <(gzcat data/chembl_annotation.csv.gz) | gzip > data/chembl_annotation_filtered.csv.gz
 ```
-
-View the top 5 rows of the filtered annotation file
-
-```sh
-head -n 5 <(gzcat data/chembl_annotation_filtered.csv.gz)
-```
-
-```text
-assay_chembl_id,target_chembl_id,assay_type,molecule_chembl_id,pchembl_value,confidence_score,standard_inchi_key,pref_name
-1931436,CHEMBL4523105,B,CHEMBL3716578,5.75,9,GUUWHOSUKOCRHG-UHFFFAOYSA-N,
-1931437,CHEMBL4523105,B,CHEMBL3716578,5.85,9,GUUWHOSUKOCRHG-UHFFFAOYSA-N,
-1931437,CHEMBL4523105,B,CHEMBL4571346,5.01,9,ILKYRSSTSHMXTC-UHFFFAOYSA-N,
-446514,CHEMBL2094132,B,CHEMBL1112,6.3,5,CEUORZQYGODEFX-UHFFFAOYSA-N,ARIPIPRAZOLE
-```
-
-Rendered as a table:
-
-| assay_chembl_id | target_chembl_id | assay_type | molecule_chembl_id | pchembl_value | confidence_score | standard_inchi_key          | pref_name    |
-|-----------------|------------------|------------|--------------------|---------------|------------------|-----------------------------|--------------|
-| 1931436         | CHEMBL4523105    | B          | CHEMBL3716578      | 5.75          | 9                | GUUWHOSUKOCRHG-UHFFFAOYSA-N |              |
-| 1931437         | CHEMBL4523105    | B          | CHEMBL3716578      | 5.85          | 9                | GUUWHOSUKOCRHG-UHFFFAOYSA-N |              |
-| 1931437         | CHEMBL4523105    | B          | CHEMBL4571346      | 5.01          | 9                | ILKYRSSTSHMXTC-UHFFFAOYSA-N |              |
-| 446514          | CHEMBL2094132    | B          | CHEMBL1112         | 6.3           | 5                | CEUORZQYGODEFX-UHFFFAOYSA-N | ARIPIPRAZOLE |
-
 Count the number of rows in the filtered annotation file
 
 ```sh
@@ -188,6 +164,8 @@ CHEMBL4097563,AAAAJHGLNDAXFP-VNKVACROSA-N,
 CHEMBL246893,AAAAKTROWFNLEP-UHFFFAOYSA-N,
 ```
 
+Rendered as a table:
+
 | molecule_chembl_id | standard_inchi_key          | pref_name |
 |--------------------|-----------------------------|-----------|
 | CHEMBL4972698      | AAAADVYFXUUVEO-UHFFFAOYSA-N |           |
@@ -207,27 +185,6 @@ Now find rows in `data/inchikey_chembl.csv.gz` that have `standard_inchi_key` th
 ```sh
 csvgrep -c standard_inchi_key -f data/compound_inchi_key.csv <(gzcat data/inchikey_chembl.csv.gz) | gzip > data/inchikey_chembl_filtered.csv.gz
 ```
-
-View the top 5 rows of the `inchikey_chembl_filtered.csv.gz` file
-
-```sh
-head -n 5 <(gzcat data/inchikey_chembl_filtered.csv.gz)
-```
-
-```text
-molecule_chembl_id,standard_inchi_key,pref_name
-CHEMBL592894,AAAJHRMBUHXWLD-UHFFFAOYSA-N,
-CHEMBL268868,AAALVYBICLMAMA-UHFFFAOYSA-N,DAPH
-CHEMBL1734241,AAAZRMGPBSWFDK-UHFFFAOYSA-N,
-CHEMBL3449946,AABSTWCOLWSFRA-UHFFFAOYSA-N,
-```
-
-| molecule_chembl_id | standard_inchi_key          | pref_name |
-|--------------------|-----------------------------|-----------|
-| CHEMBL592894       | AAAJHRMBUHXWLD-UHFFFAOYSA-N |           |
-| CHEMBL268868       | AAALVYBICLMAMA-UHFFFAOYSA-N | DAPH      |
-| CHEMBL1734241      | AAAZRMGPBSWFDK-UHFFFAOYSA-N |           |
-| CHEMBL3449946      | AABSTWCOLWSFRA-UHFFFAOYSA-N |           |
 
 Count the number of unique values of each column in `inchikey_chembl_filtered.csv.gz`
 
