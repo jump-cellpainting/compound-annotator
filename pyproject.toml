@@ -17,6 +17,7 @@ tqdm = "^4.64.1"
 rdkit = "^2022.9.4"
 PyMySQL = "^1.0.2"
 chembl-webresource-client = "^0.10.8"
+csvkit = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
