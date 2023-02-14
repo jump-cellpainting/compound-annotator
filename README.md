@@ -1,6 +1,6 @@
 # compound-annotator
 
-Credits: [Lewis Mervin](@lewismervin1) for the orignal source code.
+Credits: [Lewis Mervin](https://github.com/lewismervin1) for the orignal source code.
 
 ## Setup
 
