@@ -10,8 +10,8 @@ Credits: [Lewis Mervin](https://github.com/lewismervin1) for the orignal source 
 
 For Linux, see
 
-- https://github.com/python-poetry/poetry/issues/1917#issuecomment-1380429197 if installing six fails
-- https://stackoverflow.com/a/75435100 if you get "does not contain any element" warning when running `poetry install`
+- <https://github.com/python-poetry/poetry/issues/1917#issuecomment-1380429197> if installing six fails
+- <https://stackoverflow.com/a/75435100> if you get "does not contain any element" warning when running `poetry install`
 
 ## Run
 
