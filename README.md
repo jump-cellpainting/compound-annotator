@@ -62,25 +62,6 @@ Rendered as a table:
 | 1714633         | CHEMBL3987582    | B          | CHEMBL4108338      | 6.15          | 7                | OZBMIGDQBBMIRA-CQSZACIVSA-N |           |
 | 1714649         | CHEMBL3987582    | B          | CHEMBL4108338      | 5.84          | 7                | OZBMIGDQBBMIRA-CQSZACIVSA-N |           |
 
-### Create filtered annotation file
-
-Filter the annotation file to only include rows with `standard_inchi_key` that are present in the `compound.csv.gz` file
-
-```sh
-wget https://raw.githubusercontent.com/jump-cellpainting/datasets/0682dd2d52e4d68208ab4af3a0bd114ca557cb0e/metadata/compound.csv.gz
-mv compound.csv.gz data/
-```
-
-```sh
-gzcat data/compound.csv.gz | csvcut -c Metadata_InChIKey| tail -n +2 | sort | uniq > data/compound_inchi_key.csv
-```
-
-Now find rows in `data/chembl_annotation.csv` that have `standard_inchi_key` that are present in `data/compound_inchi_key.csv`
-
-```sh
-csvgrep -c standard_inchi_key -f data/compound_inchi_key.csv <(gzcat data/chembl_annotation.csv.gz) | gzip > data/chembl_annotation_filtered.csv.gz
-```
-
 Count the number of rows in the  annotation file
 
 ```sh
@@ -99,6 +80,25 @@ gzcat data/chembl_annotation.csv.gz | csvcut -c standard_inchi_key | tail -n +2 
 
 ```text
 556272
+```
+
+### Create filtered annotation file
+
+Filter the annotation file to only include rows with `standard_inchi_key` that are present in the `compound.csv.gz` file
+
+```sh
+wget https://raw.githubusercontent.com/jump-cellpainting/datasets/0682dd2d52e4d68208ab4af3a0bd114ca557cb0e/metadata/compound.csv.gz
+mv compound.csv.gz data/
+```
+
+```sh
+gzcat data/compound.csv.gz | csvcut -c Metadata_InChIKey| tail -n +2 | sort | uniq > data/compound_inchi_key.csv
+```
+
+Now find rows in `data/chembl_annotation.csv` that have `standard_inchi_key` that are present in `data/compound_inchi_key.csv`
+
+```sh
+csvgrep -c standard_inchi_key -f data/compound_inchi_key.csv <(gzcat data/chembl_annotation.csv.gz) | gzip > data/chembl_annotation_filtered.csv.gz
 ```
 
 View the top 5 rows of the filtered annotation file
