@@ -187,5 +187,3 @@ molecule_chembl_id: 30072
 standard_inchi_key: 30072
 pref_name: 2508
 ```
-
-`data/compound_inchi_key.csv`
