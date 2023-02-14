@@ -55,13 +55,23 @@ gzcat data/chembl_annotation.csv.gz | wc -l
 # 1185184
 ```
 
+Count the number of unique values of each column in the annotation file
+
+```sh
+function count_unique_values() {
+    data_file=$1
+    colnames=$2
+    for colname in ${colnames}; do
+        echo -n $colname:
+        gzcat ${data_file} | csvcut -c ${colname} | tail -n +2 | sort | uniq | wc -l | tr -s " "
+    done
+}
+```
+
 ```sh
 data_file=data/chembl_annotation.csv.gz
 colnames="assay_chembl_id target_chembl_id assay_type molecule_chembl_id standard_inchi_key pref_name"
-for colname in ${colnames}; do
-    echo -n $colname:
-    gzcat ${data_file} | csvcut -c ${colname} | tail -n +2 | sort | uniq | wc -l | tr -s " "
-done
+count_unique_values ${data_file} "${colnames}"
 ```
 
 ```text
@@ -104,10 +114,7 @@ Count the number of unique values of each column in the filtered annotation file
 ```sh
 data_file=data/chembl_annotation_filtered.csv.gz
 colnames="assay_chembl_id target_chembl_id assay_type molecule_chembl_id standard_inchi_key pref_name"
-for colname in ${colnames}; do
-    echo -n $colname:
-    gzcat ${data_file} | csvcut -c ${colname} | tail -n +2 | sort | uniq | wc -l | tr -s " "
-done
+count_unique_values ${data_file} "${colnames}"
 ```
 
 ```text
@@ -172,10 +179,7 @@ Count the number of unique values of each column in `inchikey_chembl_filtered.cs
 ```sh
 data_file=data/inchikey_chembl_filtered.csv.gz
 colnames="molecule_chembl_id standard_inchi_key pref_name"
-for colname in ${colnames}; do
-    echo -n $colname:
-    gzcat ${data_file} | csvcut -c ${colname} | tail -n +2 | sort | uniq | wc -l | tr -s " "
-done
+count_unique_values ${data_file} "${colnames}"
 ```
 
 ```text
@@ -183,3 +187,5 @@ molecule_chembl_id: 30072
 standard_inchi_key: 30072
 pref_name: 2508
 ```
+
+`data/compound_inchi_key.csv`
