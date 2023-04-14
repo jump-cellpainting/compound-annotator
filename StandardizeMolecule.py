@@ -1,19 +1,20 @@
-import logging
 from collections import Counter
-import numpy as np
-import pandas as pd
 from multiprocessing import Pool
-import tqdm
 from rdkit import rdBase
 from rdkit.Chem import MolFromSmiles, MolToSmiles, MolToInchi, MolToInchiKey
 from rdkit.Chem.MolStandardize import Standardizer
 from typing import Union
+import fire
+import logging
+import numpy as np
+import pandas as pd
+import tqdm
 
 
 class StandardizeMolecule:
     def __init__(
         self,
-        input: Union(str, pd.DataFrame) = None,
+        input: Union[str, pd.DataFrame],
         output: str = None,
         num_cpu: int = 1,
     ):
@@ -160,8 +161,6 @@ class StandardizeMolecule:
         else:
             return standardized_df
 
-
-import fire
 
 if __name__ == "__main__":
     fire.Fire(StandardizeMolecule)
