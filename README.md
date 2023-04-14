@@ -22,6 +22,18 @@ mamba activate compound-annotator
 
 ```
 
+## Standardizing SMILES strings
+
+Example:
+
+```sh
+python \
+    StandardizeMolecule.py \
+    --input https://s3.amazonaws.com/data.clue.io/repurposing/downloads/repurposing_samples_20200324.txt  \
+    --output ~/Desktop/repurposing_samples_20200324.csv \
+    run
+```
+
 ## ChEMBL annotations
 
 The steps below produce the following file:
