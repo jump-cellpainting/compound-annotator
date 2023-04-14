@@ -8,6 +8,7 @@ import fire
 import logging
 import numpy as np
 import pandas as pd
+import requests
 import tqdm
 
 
@@ -21,7 +22,7 @@ class StandardizeMolecule:
         """
         Initialize the class.
 
-        :param input: Input file name or a pandas dataframe containing the SMILES
+        :param input: Input file name (TSV/TXT/CSV) or a pandas dataframe containing the SMILES
         :param output: Output file name (optional)
         :param num_cpu: Number of CPUs to use
 
@@ -127,6 +128,28 @@ class StandardizeMolecule:
             )
         return pd.concat(standardized_dfs, ignore_index=True)
 
+    def skip_rows_bang(self, file_or_url):
+        """
+        Return the rows that start with a bang.
+
+        :param file_or_url: Input file name, either a local file or a URL
+
+        """
+        # Check if the input is a URL
+        if file_or_url.startswith("http://") or file_or_url.startswith("https://"):
+            response = requests.get(file_or_url)
+            content = response.content.decode("utf-8")
+            lines = content.splitlines()
+        else:
+            with open(file_or_url, "r") as f:
+                lines = f.readlines()
+
+        exclamation_indices = [
+            index for index, line in enumerate(lines) if line.startswith("!")
+        ]
+
+        return exclamation_indices
+
     def _load_input(self):
         """
         Read the input and return a pandas dataframe containing the SMILES.
@@ -134,13 +157,43 @@ class StandardizeMolecule:
         :return: dataframe: Pandas dataframe containing the SMILES
         """
         if isinstance(self.input, str):
-            self.input = pd.read_csv(self.input)
-            # if the columns SMILES is not present, raise an error
-            if "SMILES" not in self.input.columns:
-                raise ValueError("Input file must contain a column named 'SMILES'.")
+            # read the input file, and figure out if it is a csv or a tsv file
+            if self.input.endswith(".csv"):
+                sep = ","
+            elif self.input.endswith((".tsv", ".txt")):
+                sep = "\t"
+            else:
+                raise ValueError("Input file must be either a csv or a tsv/txt file.")
+
+            self.input = pd.read_csv(
+                self.input,
+                sep=sep,
+                skiprows=self.skip_rows_bang(self.input),
+            )
+
             # if there are no rows, raise an error
             if len(self.input) == 0:
                 raise ValueError("Input file must contain at least one row.")
+
+            # if the columns SMILES or smiles is not present, raise an error
+            if (
+                "SMILES" not in self.input.columns
+                and "smiles" not in self.input.columns
+            ):
+                raise ValueError(
+                    "Input file must contain a column named SMILES or smiles."
+                )
+
+            # if the column SMILES is not present, rename the column smiles to SMILES
+            if "SMILES" not in self.input.columns:
+                self.input = self.input.rename(columns={"smiles": "SMILES"})
+
+            # if both SMILES and smiles are present, raise an error
+            if "SMILES" in self.input.columns and "smiles" in self.input.columns:
+                raise ValueError(
+                    "Input file must contain only one column named SMILES."
+                )
+
         elif isinstance(self.input, pd.DataFrame):
             pass
         else:
