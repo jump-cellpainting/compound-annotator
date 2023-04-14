@@ -13,17 +13,63 @@ For Linux, see
 - <https://github.com/python-poetry/poetry/issues/1917#issuecomment-1380429197> if installing six fails
 - <https://stackoverflow.com/a/75435100> if you get "does not contain any element" warning when running `poetry install`
 
-## Produce ChEMBL annotations
+## ChEMBL annotations
 
-The steps below produce the following files:
+The steps below produce the following file:
+
+- `data/chembl_annotation_filtered.csv.gz`: ChEMBL annotation file filtered to only include rows with `standard_inchi_key` that are present in the `compound.csv.gz` file (this is the metadata file from the jump-cellpainting/datasets repo).
+
+Here's how we'd use this file to annotate the `compound.csv.gz` file:
+
+```python
+import pandas as pd
+
+# Read in the compound metadata file
+compound_df = pd.read_csv("data/compound.csv.gz")
+
+# Read in the ChEMBL annotation file
+chembl_df = pd.read_csv("data/chembl_annotation_filtered.csv.gz")
+
+# Merge the two dataframes
+merged_df = compound_df.merge(chembl_df, left_on="Metadata_InChIKey", right_on="standard_inchi_key")
+
+# Count the number of rows in the merged dataframe
+merged_df.shape
+```
+
+```text
+(44017, 11)
+```
+
+```python
+# Select the first row and print the values of the columns
+merged_df.iloc[0]
+```
+
+```text
+Metadata_JCP2022                                         JCP2022_000003
+Metadata_InChIKey                           AAALVYBICLMAMA-UHFFFAOYSA-N
+Metadata_InChI        InChI=1S/C20H15N3O2/c24-19-15-11-17(21-13-7-3-...
+assay_chembl_id                                                   29499
+target_chembl_id                                              CHEMBL203
+assay_type                                                            B
+molecule_chembl_id                                         CHEMBL268868
+pchembl_value                                                       6.8
+confidence_score                                                      8
+standard_inchi_key                          AAALVYBICLMAMA-UHFFFAOYSA-N
+pref_name                                                          DAPH
+```
+
+The following files are also produced:
 
 - `data/chembl_annotation.csv.gz`: ChEMBL annotation file. This is the raw output of a SQL query run on the ChEMBL SQLite database to get a subset of the data that we need.
-- `data/chembl_annotation_filtered.csv.gz`: ChEMBL annotation file filtered to only include rows with `standard_inchi_key` that are present in the `compound.csv.gz` file (this is the metadata file from the jump-cellpainting/datasets repo).
-- `data/inchikey_chembl_filtered.csv.gz`: Mapping of `standard_inchi_key` to `molecule_chembl_id` from the filtered ChEMBL annotation file. This will allow us to map the `compound_id` in the `compound.csv.gz` file to the `molecule_chembl_id` in the ChEMBL annotation file.
+- `data/inchikey_chembl_filtered.csv.gz`: Mapping of `standard_inchi_key` to `molecule_chembl_id` from the filtered ChEMBL annotation file.
 
-Using these files, we can annotate the `compound.csv.gz` file with the `molecule_chembl_id` column.
+### Steps for producing ChEMBL annotations
 
-### Create annotation file
+<details>
+
+#### Create annotation file
 
 On a VM with >40G disk space, download ChEMBL SQLite database (4.2G compressed, 23G uncompressed)
 
@@ -91,7 +137,7 @@ standard_inchi_key: 56272
 pref_name: 6536
 ```
 
-### Create filtered annotation file
+#### Create filtered annotation file
 
 Filter the annotation file to only include rows with `standard_inchi_key` that are present in the `compound.csv.gz` file
 
@@ -148,7 +194,7 @@ gzcat data/compound.csv.gz | csvcut -c Metadata_InChIKey| tail -n +2 | sort | un
 csvgrep -c standard_inchi_key -f data/compound_inchi_key.txt <(gzcat data/chembl_annotation.csv.gz) | gzip > data/chembl_annotation_filtered.csv.gz
 ```
 
-### Create mapping between `standard_inchi_key` and `chembl_id`
+#### Create mapping between `standard_inchi_key` and `chembl_id`
 
 Run SQL query to get mapping between `standard_inchi_key` and `chembl_id`
 
@@ -202,3 +248,5 @@ molecule_chembl_id: 30072
 standard_inchi_key: 30072
 pref_name: 2508
 ```
+
+</details>
