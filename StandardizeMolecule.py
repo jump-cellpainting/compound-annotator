@@ -18,6 +18,7 @@ class StandardizeMolecule:
         input: Union[str, pd.DataFrame],
         output: str = None,
         num_cpu: int = 1,
+        limit_rows: int = None,
     ):
         """
         Initialize the class.
@@ -25,11 +26,13 @@ class StandardizeMolecule:
         :param input: Input file name (TSV/TXT/CSV) or a pandas dataframe containing the SMILES
         :param output: Output file name (optional)
         :param num_cpu: Number of CPUs to use
+        :param limit_rows: Limit the number of rows to be processed (optional)
 
         """
         self.input = input
         self.output = output
         self.num_cpu = num_cpu
+        self.limit_rows = limit_rows
 
         # Disable RDKit logging
         rdBase.DisableLog("rdApp.*")
@@ -198,6 +201,19 @@ class StandardizeMolecule:
             pass
         else:
             raise ValueError("Input must be either a filename or a pandas dataframe.")
+
+        # if self.limit_rows is not None, limit the number of rows to self.limit_rows
+        if self.limit_rows is not None:
+            self.input = self.input.head(self.limit_rows)
+
+        # select only the SMILES column
+        self.input = self.input[["SMILES"]]
+
+        # drop missing values
+        self.input = self.input.dropna()
+
+        # drop duplicates
+        self.input = self.input.drop_duplicates()
 
     def run(self):
         """

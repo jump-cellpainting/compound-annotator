@@ -26,12 +26,26 @@ mamba activate compound-annotator
 
 Example:
 
+(Drop `limit_rows` to process the entire file)
+
 ```sh
 python \
     StandardizeMolecule.py \
+    --num_cpu 8 \
+    --limit_rows 10 \
     --input https://s3.amazonaws.com/data.clue.io/repurposing/downloads/repurposing_samples_20200324.txt  \
     --output ~/Desktop/repurposing_samples_20200324.csv \
     run
+
+python -c "import pandas as pd; print(pd.read_csv('~/Desktop/repurposing_samples_20200324.csv').applymap(lambda x: str(x)[:15]).to_string(index=False))"
+```
+
+```text
+SMILES_original          SMILES           InChI        InChIKey
+CN1CCc2cccc-3c2 CN1CCc2cccc3c2C InChI=1S/C17H17 VMWNQDUVQKEIOC-
+COc1ccc(cc1OC1C COc1ccc(C2CNC(= InChI=1S/C16H21 HJORMJIFDVBMOB-
+NC[C@H](CC(O)=O NCC(CC(=O)O)c1c InChI=1S/C10H12 KPYSYYIEGFHWSV-
+COc1ccc(cc1OC1C COc1ccc(C2CNC(= InChI=1S/C16H21 HJORMJIFDVBMOB-
 ```
 
 ## ChEMBL annotations
