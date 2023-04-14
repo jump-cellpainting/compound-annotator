@@ -84,6 +84,10 @@ python csv2md.py <(gzcat data/chembl_annotation.csv.gz|head -n 5)
 | 1714633         | CHEMBL3987582    | B          | CHEMBL4108338      | 6.15          | 7                | OZBMIGDQBBMIRA-CQSZACIVSA-N |           |
 | 1714649         | CHEMBL3987582    | B          | CHEMBL4108338      | 5.84          | 7                | OZBMIGDQBBMIRA-CQSZACIVSA-N |           |
 
+<details>
+
+<summary>Meaning of each column</summary>
+
 1. `activities.assay_ID`: This is the unique identifier for a specific bioactivity assay in the ChEMBL database. An assay is an experimental procedure designed to measure the biological activity or effect of compounds on their targets.
 1. `target_dictionary.chembl_id`: This is the unique ChEMBL identifier for a molecular target. A target is typically a protein, nucleic acid, or other biomolecule that a compound interacts with, often resulting in a biological effect.
 1. `assays.assay_type`: This column indicates the type of bioactivity assay performed. Common assay types include 'B' for binding assays, 'F' for functional assays, 'A' for ADMET assays, and 'T' for toxicity assays.
@@ -92,6 +96,8 @@ python csv2md.py <(gzcat data/chembl_annotation.csv.gz|head -n 5)
 1. `assays.confidence_score`: This is a numeric value (0-9) that indicates the level of confidence in the assignment of a molecular target to an assay. Higher values indicate higher confidence, with 9 being the highest confidence.
 1. `compound_structures.standard_inchi_key`: This is the unique standard InChI key for the chemical structure of a compound. InChI keys are alphanumeric strings that serve as unique identifiers for chemical substances, making it easier to compare and share chemical information.
 1. `molecule_dictionary.pref_name`: This column contains the preferred name or common name for a molecule in the ChEMBL database, making it easier for users to recognize and refer to the molecule.
+
+</details>
 
 Count the number of rows in the annotation file
 
