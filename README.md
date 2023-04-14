@@ -35,8 +35,7 @@ merged_df = compound_df.merge(chembl_df, left_on="Metadata_InChIKey", right_on="
 
 # Count the number of rows in the merged dataframe
 merged_df.shape
-#
-(44017, 11)
+# (44017, 11)
 
 # Select the first row and print the values of the columns
 merged_df.iloc[0]
