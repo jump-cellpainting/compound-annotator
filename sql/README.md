@@ -1,6 +1,6 @@
 # SQL queries
 
-`extract_chembl_annotation.sql`:
+## `extract_chembl_annotation.sql`
 
 This SQL query retrieves a list of bioactivity data for small molecules with a focus on human targets from the ChEMBL database. The query is designed to filter and return specific information from multiple tables within the database. Here's a breakdown of what the query is doing:
 
@@ -33,7 +33,7 @@ Notes:
 1. `compound_structures.standard_inchi_key`: This is the unique standard InChI key for the chemical structure of a compound. InChI keys are alphanumeric strings that serve as unique identifiers for chemical substances, making it easier to compare and share chemical information.
 1. `molecule_dictionary.pref_name`: This column contains the preferred name or common name for a molecule in the ChEMBL database, making it easier for users to recognize and refer to the molecule.
 
-`extract_chebi_inchikey_mapping.sql`:
+## `extract_chebi_inchikey_mapping.sql`
 
 This SQL query retrieves unique molecular data from the ChEMBL database by joining the `compound_structures` and `molecule_dictionary` tables using the `molregno` column.
 It selects the ChEMBL ID, standard InChI key, and preferred name of each molecule.
