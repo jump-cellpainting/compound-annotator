@@ -4,14 +4,23 @@ Credits: [Lewis Mervin](https://github.com/lewismervin1) for the orignal source 
 
 ## Setup
 
-1. [Install Python](https://www.python.org/downloads/)
-1. [Install Poetry](https://python-poetry.org/docs/#installation)
-1. [Install Poetry Environment](https://python-poetry.org/docs/basic-usage/#installing-dependencies): `poetry install`
+We use [mamba](https://mamba.readthedocs.io/en/latest/) to manage the computational environment.
 
-For Linux, see
+To install mamba see [instructions](https://mamba.readthedocs.io/en/latest/installation.html).
 
-- <https://github.com/python-poetry/poetry/issues/1917#issuecomment-1380429197> if installing six fails
-- <https://stackoverflow.com/a/75435100> if you get "does not contain any element" warning when running `poetry install`
+After installing mamba, execute the following to install and navigate to the environment:
+
+```bash
+# First, install the `genemod` conda environment
+mamba env create --force --file 1.analysis/environment.yml
+
+# If you had already installed this environment and now want to update it
+mamba env update --file 1.analysis/environment.yml --prune
+
+# Then, activate the environment and you're all set!
+mamba activate compound-annotator
+
+```
 
 ## ChEMBL annotations
 
