@@ -1,6 +1,7 @@
 from collections import Counter
 from multiprocessing import Pool
-from rdkit import rdBase
+from rdkit import rdBase, RDLogger
+from rdkit.rdBase import BlockLogs
 from rdkit.Chem import MolFromSmiles, MolToSmiles, MolToInchi, MolToInchiKey
 from rdkit.Chem.MolStandardize import Standardizer
 from typing import Union
@@ -37,12 +38,6 @@ class StandardizeMolecule:
         self.limit_rows = limit_rows
         self.augment = augment
 
-        # Disable RDKit logging
-        rdBase.DisableLog("rdApp.*")
-
-        # Set logging level
-        logging.basicConfig(level=logging.INFO)
-
     def _standardize_structure(self, smiles):
         """
         Standardize the given SMILES using MolVS and RDKit.
@@ -54,6 +49,9 @@ class StandardizeMolecule:
         standardizer = Standardizer()
 
         smiles_original = smiles
+
+        # Disable RDKit logging
+        block = BlockLogs()
 
         # Read SMILES and convert it to RDKit mol object
         mol = MolFromSmiles(smiles)
@@ -107,6 +105,8 @@ class StandardizeMolecule:
             inchi_standardized = np.nan
             inchikey_standardized = np.nan
             logging.error(f"Standardization error, {smiles}, Error Type: {str(e)}")
+
+        del block
 
         # return as a dataframe
         return pd.DataFrame(
