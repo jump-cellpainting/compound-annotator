@@ -148,6 +148,7 @@ class StandardizeMolecule:
             lines = content.splitlines()
         elif file_or_url.endswith(".gz"):
             import gzip
+
             with gzip.open(file_or_url, "rt") as f:
                 lines = f.readlines()
         else:
