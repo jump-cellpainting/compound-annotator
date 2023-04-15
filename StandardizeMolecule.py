@@ -59,7 +59,14 @@ class StandardizeMolecule:
         # Check if the input SMILES has been converted into a mol object
         if mol is None:
             logging.error(f"Reading Error, {smiles}")
-            return np.nan, np.nan
+            return pd.DataFrame(
+                columns=[
+                    "SMILES_original",
+                    "SMILES_standardized",
+                    "InChI_standardized",
+                    "InChIKey_standardized",
+                ]
+            )
 
         try:
             smiles_clean_counter = Counter()
