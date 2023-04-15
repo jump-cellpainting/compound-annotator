@@ -48,6 +48,88 @@ NC[C@H](CC(O)=O NCC(CC(=O)O)c1c InChI=1S/C10H12 KPYSYYIEGFHWSV-
 COc1ccc(cc1OC1C COc1ccc(C2CNC(= InChI=1S/C16H21 HJORMJIFDVBMOB-
 ```
 
+## Drug Repurposing Hub annotations
+
+The steps below produce the following file:
+
+- `data/repurposinghub_annotation_filtered.csv.gz`: Drug Repurposing Hub annotation file filtered to only include rows with `standard_inchi_key` that are present in the `compound.csv.gz` file (this is the metadata file from the jump-cellpainting/datasets repo).
+
+Here's how we'd use this file to annotate the `compound.csv.gz` file:
+
+```python
+import pandas as pd
+
+# Read in the compound metadata file
+compound_df = pd.read_csv("data/compound.csv.gz")
+
+# Read in the Repurposing Hub annotation file
+repurposinghub_df = pd.read_csv("data/repurposinghub_annotation_filtered.csv.gz")
+
+# Merge the two dataframes
+merged_df = compound_df.merge(chembl_df, left_on="Metadata_InChIKey", right_on="standard_inchi_key")
+
+# Count the number of rows in the merged dataframe
+merged_df.shape
+# (, )
+
+# Select the first row and print the values of the columns
+merged_df.iloc[0]
+```
+
+```text
+
+```
+
+### Steps for producing Drug Repurposing Hub annotations
+
+<details>
+
+Download the Drug Repurposing Hub annotations
+
+```sh
+wget https://s3.amazonaws.com/data.clue.io/repurposing/downloads/repurposing_samples_20200324.txt -O data/repurposing_samples_20200324.txt
+wget https://s3.amazonaws.com/data.clue.io/repurposing/downloads/repurposing_drugs_20200324.txt -O data/repurposing_drugs_20200324.txt
+
+cat data/repurposing_samples_20200324.txt | grep -v "^\!" > data/repurposing_samples_20200324_cleaned.txt
+cat data/repurposing_drugs_20200324.txt | grep -v "^\!" > data/repurposing_drugs_20200324_cleaned.txt
+
+python -c "import pandas as pd; import csv; df = pd.read_csv('data/repurposing_samples_20200324_cleaned.txt', sep='\t'); df = df[['pert_iname', 'smiles']]; df = df.drop_duplicates(); df.to_csv('data/repurposing_samples_20200324_cleaned.csv', index=False, quoting=csv.QUOTE_NONNUMERIC)"
+
+python -c "import pandas as pd; import csv; df = pd.read_csv('data/repurposing_drugs_20200324_cleaned.txt', sep='\t'); df.to_csv('data/repurposing_drugs_20200324_cleaned.csv', index=False, quoting=csv.QUOTE_NONNUMERIC)"
+
+rm data/repurposing_samples_20200324_cleaned.txt
+rm data/repurposing_samples_20200324.txt
+rm data/repurposing_drugs_20200324_cleaned.txt
+rm data/repurposing_drugs_20200324.txt
+```
+
+```sh
+python \
+    StandardizeMolecule.py \
+    --num_cpu 7 \
+    --limit_rows 20 \
+    --augment \
+    --input data/repurposing_samples_20200324_cleaned.csv \
+    --output data/repurposing_samples_20200324_standardized_lut.csv \
+    run
+
+python -c "import pandas as pd; import csv; df = pd.read_csv('data/repurposing_samples_20200324_standardized_lut.csv'); df = df[['InChIKey_standardized', 'pert_iname']]; df = df.drop_duplicates();  df = df.rename(columns={'InChIKey_standardized': 'InChIKey'}); df.to_csv('data/repurposing_samples_20200324_standardized_lut.csv', index=False, quoting=csv.QUOTE_NONNUMERIC)"
+
+```
+
+```sh
+commit=0682dd2d52e4d68208ab4af3a0bd114ca557cb0e
+
+wget https://raw.githubusercontent.com/jump-cellpainting/datasets/${commit}/metadata/compound.csv.gz
+
+mv compound.csv.gz data/
+
+gzcat data/compound.csv.gz | csvcut -c Metadata_InChIKey| tail -n +2 | sort | uniq > data/compound_inchi_key.txt
+
+```
+
+</details>
+
 ## ChEMBL annotations
 
 The steps below produce the following file:
