@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD033 -->
 # compound-annotator
 
 Credits: [Lewis Mervin](https://github.com/lewismervin1) for the orignal source code.
