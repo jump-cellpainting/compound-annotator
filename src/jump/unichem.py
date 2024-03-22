@@ -17,7 +17,8 @@ REV_SOURCE_IDS = pd.read_csv(
     'https://ftp.ebi.ac.uk/pub/databases/chembl/UniChem/data/table_dumps/source.tsv.gz',
     sep='\t').set_index('NAME')['SRC_ID']
 JUMP_INCHIKEYS = pd.read_csv(
-    'https://github.com/jump-cellpainting/datasets/raw/main/metadata/compound.csv.gz'
+    # 'https://github.com/jump-cellpainting/datasets/raw/main/metadata/compound.csv.gz'
+    'https://github.com/jump-cellpainting/datasets/raw/b1fd73089dbd53fb329ea2b84f877d279ca58dbc/metadata/compounds_SMILES.csv.gz'
 ).Metadata_InChIKey.dropna().drop_duplicates()
 
 
