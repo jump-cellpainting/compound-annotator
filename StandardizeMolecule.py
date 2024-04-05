@@ -63,8 +63,8 @@ class StandardizeMolecule:
 
         smiles_original = smiles
 
-        # # Disable RDKit logging
-        # block = BlockLogs()
+        # Disable RDKit logging
+        block = BlockLogs()
 
         # Read SMILES and convert it to RDKit mol object
         mol = MolFromSmiles(smiles)
