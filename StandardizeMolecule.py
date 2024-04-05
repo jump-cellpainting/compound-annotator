@@ -2,8 +2,14 @@ from collections import Counter
 from multiprocessing import Pool
 from rdkit import rdBase, RDLogger
 from rdkit.rdBase import BlockLogs
-from rdkit.Chem import MolFromSmiles, MolToSmiles, MolToInchi, MolToInchiKey
-from rdkit.Chem.MolStandardize import Standardizer
+from rdkit.Chem import (
+    MolFromSmiles,
+    MolToSmiles,
+    MolToInchi,
+    MolToInchiKey,
+    MolFromInchi,
+)
+from rdkit.Chem.MolStandardize import Standardizer, rdMolStandardize, tautomer
 from typing import Union
 import fire
 import logging
@@ -11,6 +17,10 @@ import numpy as np
 import pandas as pd
 import requests
 import tqdm
+
+from rdkit import RDLogger
+
+RDLogger.DisableLog("rdApp.*")
 
 
 class StandardizeMolecule:
@@ -21,6 +31,7 @@ class StandardizeMolecule:
         num_cpu: int = 1,
         limit_rows: int = None,
         augment: bool = False,
+        method: str = "jump",
     ):
         """
         Initialize the class.
@@ -30,6 +41,7 @@ class StandardizeMolecule:
         :param num_cpu: Number of CPUs to use (default: 1)
         :param limit_rows: Limit the number of rows to be processed (optional)
         :param augment: The output is the input file augmented with the standardized SMILES, InChI, and InChIKey (default: False)
+        :param method: Standardization method to use: "jump" or "seal" (default: "jump")
 
         """
         self.input = input
@@ -37,8 +49,9 @@ class StandardizeMolecule:
         self.num_cpu = num_cpu
         self.limit_rows = limit_rows
         self.augment = augment
+        self.method = method
 
-    def _standardize_structure(self, smiles):
+    def _standardize_structure_jump(self, smiles):
         """
         Standardize the given SMILES using MolVS and RDKit.
 
@@ -50,8 +63,8 @@ class StandardizeMolecule:
 
         smiles_original = smiles
 
-        # Disable RDKit logging
-        block = BlockLogs()
+        # # Disable RDKit logging
+        # block = BlockLogs()
 
         # Read SMILES and convert it to RDKit mol object
         mol = MolFromSmiles(smiles)
@@ -113,12 +126,84 @@ class StandardizeMolecule:
             inchikey_standardized = np.nan
             logging.error(f"Standardization error, {smiles}, Error Type: {str(e)}")
 
-        del block
-
         # return as a dataframe
         return pd.DataFrame(
             {
                 "SMILES_original": [smiles_original],
+                "SMILES_standardized": [smiles_standardized],
+                "InChI_standardized": [inchi_standardized],
+                "InChIKey_standardized": [inchikey_standardized],
+            }
+        )
+
+    def _standardize_structure_seal(self, smiles):
+        """
+        Standardize the given InChI using the modified method (seal).
+
+        :param smiles: Input InChI from the given structure data file
+        :return: dataframe: Pandas dataframe containing the original InChI, standardized SMILES, InChI, and InChIKey
+
+        """
+        standardizer = Standardizer()
+
+        try:
+            # Read SMILES and convert it to RDKit mol object
+            mol = MolFromSmiles(smiles)
+            smiles_clean_counter = Counter()
+            mol_dict = {}
+            is_finalize = False
+
+            # This solved phosphate oxidation in most cases but introduces a problem for some compounds: eg. geldanamycin where the stable strcutre is returned
+            inchi_standardised = MolToInchi(mol)
+            mol = MolFromInchi(inchi_standardised)
+
+            # removeHs, disconnect metal atoms, normalize the molecule, reionize the molecule
+            mol = rdMolStandardize.Cleanup(mol)
+            # if many fragments, get the "parent" (the actual mol we are interested in)
+            mol = rdMolStandardize.FragmentParent(mol)
+            # try to neutralize molecule
+            uncharger = (
+                rdMolStandardize.Uncharger()
+            )  # annoying, but necessary as no convenience method exists
+
+            mol = uncharger.uncharge(mol)  # standardize molecules using MolVS and RDKit
+            mol = standardizer.charge_parent(mol)
+            mol = standardizer.isotope_parent(mol)
+            mol = standardizer.stereo_parent(mol)
+
+            # Normalize tautomers
+            normalizer = tautomer.TautomerCanonicalizer()
+            mol = normalizer.canonicalize(mol)
+
+            # Final Rules
+            mol = standardizer.standardize(mol)
+            mol_standardized = mol
+
+            # convert mol object back to SMILES
+            smiles_standardized = MolToSmiles(mol_standardized)
+
+            # Convert the mol object to InChI
+            inchi_standardized = MolToInchi(mol_standardized)
+
+            # Convert the InChI to InChIKey
+            inchikey_standardized = MolToInchiKey(mol_standardized)
+
+        except (ValueError, AttributeError, KeyError) as e:
+            smiles_standardized = np.nan
+            inchi_standardized = np.nan
+            inchikey_standardized = np.nan
+            logging.error(
+                f"Standardization error for SMILES: {smiles}, Error: {str(e)}"
+            )
+
+        smiles_standardized = np.nan
+        inchi_standardized = np.nan
+        inchikey_standardized = np.nan
+
+        # return as a dataframe
+        return pd.DataFrame(
+            {
+                "SMILES_original": [smiles],
                 "SMILES_standardized": [smiles_standardized],
                 "InChI_standardized": [inchi_standardized],
                 "InChIKey_standardized": [inchikey_standardized],
@@ -131,14 +216,21 @@ class StandardizeMolecule:
 
         :param smiles_list: List of SMILES to be standardized
         :param num_cpu: Number of CPUs to use
+
         """
+        method_map = {
+            "jump": self._standardize_structure_jump,
+            "seal": self._standardize_structure_seal,
+        }
+
         with Pool(processes=self.num_cpu) as pool:
             standardized_dfs = list(
                 tqdm.tqdm(
-                    pool.imap(self._standardize_structure, smiles_list),
+                    pool.imap(method_map[self.method], smiles_list),
                     total=len(smiles_list),
                 )
             )
+
         return pd.concat(standardized_dfs, ignore_index=True)
 
     def skip_rows_bang(self, file_or_url):
