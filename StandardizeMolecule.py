@@ -32,6 +32,7 @@ class StandardizeMolecule:
         limit_rows: int = None,
         augment: bool = False,
         method: str = "jump",
+        random_seed: int = 42,
     ):
         """
         Initialize the class.
@@ -50,6 +51,14 @@ class StandardizeMolecule:
         self.limit_rows = limit_rows
         self.augment = augment
         self.method = method
+        self.random_seed = random_seed
+
+        # check if method is valid
+
+        if self.method not in ["jump_canonical", "jump_alternate_1"]:
+            raise ValueError(
+                "Method must be either 'jump_canonical' or 'jump_alternate_1'."
+            )
 
     def _standardize_structure(self, smiles):
         """
@@ -65,6 +74,9 @@ class StandardizeMolecule:
 
         # Disable RDKit logging
         block = BlockLogs()
+
+        # Set the random seed for reproducibility within each task
+        np.random.seed(self.random_seed)
 
         # Read SMILES and convert it to RDKit mol object
         mol = MolFromSmiles(smiles)
@@ -151,7 +163,9 @@ class StandardizeMolecule:
                 smiles_standardized = MolToSmiles(mol_standardized)
 
             else:
-                raise ValueError("Method must be either 'jump' or 'seal'")
+                raise ValueError(
+                    "Method must be either 'jump_canonical' or 'jump_alternate_1'"
+                )
 
             # Convert the mol object to InChI
             inchi_standardized = MolToInchi(mol_standardized)
