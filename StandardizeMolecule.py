@@ -31,7 +31,7 @@ class StandardizeMolecule:
         num_cpu: int = 1,
         limit_rows: int = None,
         augment: bool = False,
-        method: str = "jump",
+        method: str = "jump_canonical",
         random_seed: int = 42,
     ):
         """
@@ -42,7 +42,7 @@ class StandardizeMolecule:
         :param num_cpu: Number of CPUs to use (default: 1)
         :param limit_rows: Limit the number of rows to be processed (optional)
         :param augment: The output is the input file augmented with the standardized SMILES, InChI, and InChIKey (default: False)
-        :param method: Standardization method to use: "jump" or "seal" (default: "jump")
+        :param method: Standardization method to use: "jump_canonical" or "jump_alternate_1" (default: "jump_canonical")
 
         """
         self.input = input
