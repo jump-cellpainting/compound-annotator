@@ -51,7 +51,7 @@ class StandardizeMolecule:
         self.augment = augment
         self.method = method
 
-    def _standardize_structure_jump(self, smiles):
+    def _standardize_structure(self, smiles):
         """
         Standardize the given SMILES using MolVS and RDKit.
 
@@ -86,37 +86,76 @@ class StandardizeMolecule:
             mol_dict = {}
             is_finalize = False
 
-            for _ in range(5):
-                # standardize molecules using MolVS and RDKit
+            if self.method == "jump":
+
+                for _ in range(5):
+                    # standardize molecules using MolVS and RDKit
+                    mol = standardizer.charge_parent(mol)
+                    mol = standardizer.isotope_parent(mol)
+                    mol = standardizer.stereo_parent(mol)
+                    mol = standardizer.tautomer_parent(mol)
+                    mol = standardizer.standardize(mol)
+                    mol_standardized = mol
+
+                    # convert mol object back to SMILES
+                    smiles_standardized = MolToSmiles(mol_standardized)
+
+                    if smiles == smiles_standardized:
+                        is_finalize = True
+                        break
+
+                    smiles_clean_counter[smiles_standardized] += 1
+                    if smiles_standardized not in mol_dict:
+                        mol_dict[smiles_standardized] = mol_standardized
+
+                    smiles = smiles_standardized
+                    mol = MolFromSmiles(smiles)
+
+                if not is_finalize:
+                    # If the standardization process is not finalized, we choose the most common SMILES from the counter
+                    smiles_standardized = smiles_clean_counter.most_common()[0][0]
+                    # ... and the corresponding mol object
+                    mol_standardized = mol_dict[smiles_standardized]
+
+            elif self.method == "seal":
+
+                # This solved phosphate oxidation in most cases but introduces a problem for some compounds: eg. geldanamycin where the stable strcutre is returned
+                inchi_standardised = MolToInchi(mol)
+                mol = MolFromInchi(inchi_standardised)
+
+                # removeHs, disconnect metal atoms, normalize the molecule, reionize the molecule
+                mol = rdMolStandardize.Cleanup(mol)
+                # if many fragments, get the "parent" (the actual mol we are interested in)
+                mol = rdMolStandardize.FragmentParent(mol)
+                # try to neutralize molecule
+                uncharger = (
+                    rdMolStandardize.Uncharger()
+                )  # annoying, but necessary as no convenience method exists
+
+                mol = uncharger.uncharge(
+                    mol
+                )  # standardize molecules using MolVS and RDKit
                 mol = standardizer.charge_parent(mol)
                 mol = standardizer.isotope_parent(mol)
                 mol = standardizer.stereo_parent(mol)
-                mol = standardizer.tautomer_parent(mol)
+
+                # Normalize tautomers
+                normalizer = tautomer.TautomerCanonicalizer()
+                mol = normalizer.canonicalize(mol)
+
+                # Final Rules
                 mol = standardizer.standardize(mol)
                 mol_standardized = mol
 
                 # convert mol object back to SMILES
                 smiles_standardized = MolToSmiles(mol_standardized)
 
-                if smiles == smiles_standardized:
-                    is_finalize = True
-                    break
-
-                smiles_clean_counter[smiles_standardized] += 1
-                if smiles_standardized not in mol_dict:
-                    mol_dict[smiles_standardized] = mol_standardized
-
-                smiles = smiles_standardized
-                mol = MolFromSmiles(smiles)
-
-            if not is_finalize:
-                # If the standardization process is not finalized, we choose the most common SMILES from the counter
-                smiles_standardized = smiles_clean_counter.most_common()[0][0]
-                # ... and the corresponding mol object
-                mol_standardized = mol_dict[smiles_standardized]
+            else:
+                raise ValueError("Method must be either 'jump' or 'seal'")
 
             # Convert the mol object to InChI
             inchi_standardized = MolToInchi(mol_standardized)
+
             # Convert the InChI to InChIKey
             inchikey_standardized = MolToInchiKey(mol_standardized)
 
@@ -136,80 +175,6 @@ class StandardizeMolecule:
             }
         )
 
-    def _standardize_structure_seal(self, smiles):
-        """
-        Standardize the given InChI using the modified method (seal).
-
-        :param smiles: Input InChI from the given structure data file
-        :return: dataframe: Pandas dataframe containing the original InChI, standardized SMILES, InChI, and InChIKey
-
-        """
-        standardizer = Standardizer()
-
-        try:
-            # Read SMILES and convert it to RDKit mol object
-            mol = MolFromSmiles(smiles)
-            smiles_clean_counter = Counter()
-            mol_dict = {}
-            is_finalize = False
-
-            # This solved phosphate oxidation in most cases but introduces a problem for some compounds: eg. geldanamycin where the stable strcutre is returned
-            inchi_standardised = MolToInchi(mol)
-            mol = MolFromInchi(inchi_standardised)
-
-            # removeHs, disconnect metal atoms, normalize the molecule, reionize the molecule
-            mol = rdMolStandardize.Cleanup(mol)
-            # if many fragments, get the "parent" (the actual mol we are interested in)
-            mol = rdMolStandardize.FragmentParent(mol)
-            # try to neutralize molecule
-            uncharger = (
-                rdMolStandardize.Uncharger()
-            )  # annoying, but necessary as no convenience method exists
-
-            mol = uncharger.uncharge(mol)  # standardize molecules using MolVS and RDKit
-            mol = standardizer.charge_parent(mol)
-            mol = standardizer.isotope_parent(mol)
-            mol = standardizer.stereo_parent(mol)
-
-            # Normalize tautomers
-            normalizer = tautomer.TautomerCanonicalizer()
-            mol = normalizer.canonicalize(mol)
-
-            # Final Rules
-            mol = standardizer.standardize(mol)
-            mol_standardized = mol
-
-            # convert mol object back to SMILES
-            smiles_standardized = MolToSmiles(mol_standardized)
-
-            # Convert the mol object to InChI
-            inchi_standardized = MolToInchi(mol_standardized)
-
-            # Convert the InChI to InChIKey
-            inchikey_standardized = MolToInchiKey(mol_standardized)
-
-        except (ValueError, AttributeError, KeyError) as e:
-            smiles_standardized = np.nan
-            inchi_standardized = np.nan
-            inchikey_standardized = np.nan
-            logging.error(
-                f"Standardization error for SMILES: {smiles}, Error: {str(e)}"
-            )
-
-        smiles_standardized = np.nan
-        inchi_standardized = np.nan
-        inchikey_standardized = np.nan
-
-        # return as a dataframe
-        return pd.DataFrame(
-            {
-                "SMILES_original": [smiles],
-                "SMILES_standardized": [smiles_standardized],
-                "InChI_standardized": [inchi_standardized],
-                "InChIKey_standardized": [inchikey_standardized],
-            }
-        )
-
     def _run_standardize(self, smiles_list):
         """
         Run the standardization process in parallel using multiprocessing.
@@ -218,15 +183,11 @@ class StandardizeMolecule:
         :param num_cpu: Number of CPUs to use
 
         """
-        method_map = {
-            "jump": self._standardize_structure_jump,
-            "seal": self._standardize_structure_seal,
-        }
 
         with Pool(processes=self.num_cpu) as pool:
             standardized_dfs = list(
                 tqdm.tqdm(
-                    pool.imap(method_map[self.method], smiles_list),
+                    pool.imap(self._standardize_structure, smiles_list),
                     total=len(smiles_list),
                 )
             )
