@@ -86,7 +86,7 @@ class StandardizeMolecule:
             mol_dict = {}
             is_finalize = False
 
-            if self.method == "jump":
+            if self.method == "jump_canonical":
 
                 for _ in range(5):
                     # standardize molecules using MolVS and RDKit
@@ -117,7 +117,7 @@ class StandardizeMolecule:
                     # ... and the corresponding mol object
                     mol_standardized = mol_dict[smiles_standardized]
 
-            elif self.method == "seal":
+            elif self.method == "jump_alternate_1":
 
                 # This solved phosphate oxidation in most cases but introduces a problem for some compounds: eg. geldanamycin where the stable strcutre is returned
                 inchi_standardised = MolToInchi(mol)
