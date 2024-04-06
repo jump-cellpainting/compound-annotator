@@ -85,12 +85,7 @@ class StandardizeMolecule:
         if mol is None:
             logging.error(f"Reading Error, {smiles}")
             return pd.DataFrame(
-                columns=[
-                    "SMILES_original",
-                    "SMILES_standardized",
-                    "InChI_standardized",
-                    "InChIKey_standardized",
-                ]
+                columns=["SMILES_original", "SMILES_standardized", "canonical_smiles"]
             )
 
         try:
