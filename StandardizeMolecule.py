@@ -254,6 +254,7 @@ class StandardizeMolecule:
                 self.input,
                 sep=sep,
                 skiprows=self.skip_rows_bang(self.input),
+                low_memory=False
             )
 
         elif isinstance(self.input, pd.DataFrame):
