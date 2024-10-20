@@ -1,3 +1,8 @@
+> [!CAUTION]
+> This repository  is no longer being actively maintained.
+> Annotations for JUMP will be produced using [`jump_compound_annotator`](https://github.com/broadinstitute/monorepo/tree/main/libs/jump_compound_annotator).
+
+
 # compound-annotator
 
 Credits: [Lewis Mervin](https://github.com/lewismervin1) for the orignal source code.
